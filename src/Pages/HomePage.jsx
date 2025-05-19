@@ -11,50 +11,55 @@ import { Link } from "react-router-dom";
 
 function HomePage() {
   const { userData, setUserData } = useContext(UserDataContext);
-  const[links,setLinks] = useState(null); 
-
-useEffect(()=>{
-  const storedUser = localStorage.getItem("user");
-  if (storedUser) {
-    setUserData(JSON.parse(storedUser));
-  }
-
-},[]);
+  const [links, setLinks] = useState(null);
 
   useEffect(() => {
-    
+    try {
+      const rawUser = localStorage.getItem("user");
+      const parsedUser = JSON.parse(rawUser);
+
+      if (
+        parsedUser &&
+        typeof parsedUser === "object" &&
+        !Array.isArray(parsedUser)
+      ) {
+        setUserData(parsedUser);
+      } else {
+        setUserData(null); // fallback
+        console.warn("User info is not a dictionary.");
+      }
+    } catch (e) {
+      console.error("Failed to parse user from localStorage", e);
+      setUserData(null);
+    }
+  }, []);
+
+  useEffect(() => {
     let account = null;
 
-if(userData && userData.userType === "firm"){
-account = "My firm";
-}
-else if(userData && userData.userType === "client") {
-  account = "My account";
-}
-else{
-  account = null;
-  console.log("none ");
-}
+    if (userData && userData.userType === "firm") {
+      account = "My firm";
+    } else if (userData && userData.userType === "client") {
+      account = "My account";
+    } else {
+      account = null;
+      console.log("none ");
+    }
 
-if(account){
-  if(account==="My firm"){
-    setLinks( [
-      { item: "My account",direction: `/EditFirmProfile/${userData.accountingFirm}` },
-    ]);
-  }
-  else{
-    setLinks( [
-      { item: "My account",direction: "/UserRequests" },
-    ]);
-  }
-}
-else{
-}
+    if (account) {
+      if (account === "My firm") {
+        setLinks([
+          {
+            item: "My account",
+            direction: `/EditFirmProfile/${userData.accountingFirm}`,
+          },
+        ]);
+      } else {
+        setLinks([{ item: "My account", direction: "/UserRequests" }]);
+      }
+    } else {
+    }
   }, [userData]);
-
-
-
-  
 
   return (
     <>

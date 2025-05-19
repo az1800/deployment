@@ -9,9 +9,23 @@ function ChatPage() {
   const { userData, setUserData } = useContext(UserDataContext);
 
   useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    if (storedUser) {
-      setUserData(JSON.parse(storedUser));
+    try {
+      const rawUser = localStorage.getItem("user");
+      const parsedUser = JSON.parse(rawUser);
+
+      if (
+        parsedUser &&
+        typeof parsedUser === "object" &&
+        !Array.isArray(parsedUser)
+      ) {
+        setUserData(parsedUser);
+      } else {
+        setUserData(null); // fallback
+        console.warn("User info is not a dictionary.");
+      }
+    } catch (e) {
+      console.error("Failed to parse user from localStorage", e);
+      setUserData(null);
     }
   }, []);
 
