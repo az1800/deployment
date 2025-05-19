@@ -8,7 +8,7 @@ const MongoDBStore = require("connect-mongodb-session")(session);
 const cors = require("cors");
 const multer = require("multer");
 const socketService = require("./socket.io"); // ✅ correct
-
+require("dotenv").config();
 const User = require("./models/user");
 const authRoutes = require("./routes/auth");
 const faqRoutes = require("./routes/faq");
@@ -24,13 +24,13 @@ const transactionRoutes = require("./routes/transaction");
 const ratingRoutes = require("./routes/rating");
 const app = express();
 const store = new MongoDBStore({
-  uri: "mongodb+srv://Alwaleed991:MAAA@graduationprojectcluste.de2ve.mongodb.net/AccountLink?retryWrites=true&w=majority&appName=GraduationProjectCluster",
+  uri: process.env.MONGO_URI,
   collection: "sessions",
 });
 
 app.use(
   cors({
-    origin: ["http://localhost:3000", "http://localhost:5000"],
+    origin: ["http://localhost:3000", process.env.REACT_APP_API_URL],
     credentials: true,
   })
 );
@@ -41,7 +41,7 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use("/uploads", express.static("uploads"));
 app.use(
   session({
-    secret: "JFUC8EJ34A",
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
     store: store,
@@ -68,18 +68,15 @@ const server = http.createServer(app);
 socketService.init(server);
 
 mongoose
-  .connect(
-    "mongodb+srv://Alwaleed991:MAAA@graduationprojectcluste.de2ve.mongodb.net/AccountLink?retryWrites=true&w=majority&appName=GraduationProjectCluster"
-  )
+  .connect(process.env.MONGO_URI)
   .then((result) => {
     // Use server.listen instead of app.listen
-    server.listen(5000);
-    console.log("Connected to MongoDB and started server on port 5000");
+    server.listen(5002);
+    console.log("Connected to MongoDB and started server on port 5002");
   })
   .catch((err) => {
     console.log("Connection error:", err);
   });
-const path = require("path");
 
 if (process.env.NODE_ENV === "production") {
   app.use(express.static(path.join(__dirname, "src/build")));
