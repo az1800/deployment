@@ -1,4 +1,4 @@
-import LocalizedStrings from "react-localization";
+// import LocalizedStrings from "react-localization";
 
 let strings = new LocalizedStrings({
   en: {
